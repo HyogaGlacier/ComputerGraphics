@@ -38,7 +38,40 @@ function update_position() {
 };
 
 function compute_ik(target_position) {
-    // TODO
+    let pos = [{x:0, y:0}];
+    let last_pos = {x: 0, y: 0};
+    linkages.forEach(pol => {
+       pos.push({
+           x: last_pos.x + pol.length * Math.cos(pol.angle * Math.PI / 180),
+           y: last_pos.y + pol.length * Math.sin(pol.angle * Math.PI / 180)
+       });
+       last_pos = pos[pos.length - 1];
+    });
+ 
+    for (let i = pos.length - 2; i >= 0; i--) {
+        let diff1 = {
+            x: last_pos.x - pos[i].x,
+            y: last_pos.y - pos[i].y
+        };
+        diff1.length = Math.sqrt(diff1.x * diff1.x + diff1.y * diff1.y);
+        diff1.angle = Math.atan2(diff1.y, diff1.x) / Math.PI * 180;
+        let diff2 = {
+            x: target_position[0] - pos[i].x,
+            y: target_position[1] - pos[i].y
+        };
+        diff2.length = Math.sqrt(diff2.x * diff2.x + diff2.y * diff2.y);
+        diff2.angle = Math.atan2(diff2.y, diff2.x) / Math.PI * 180;
+
+        // diff2.angle - diff1.angleだけ回転
+        // last_pos = pos[i] + (length=diff1.length, angle=diff2.angle)
+        linkages[i].angle += diff2.angle - diff1.angle;
+        while (linkages[i].angle < -180) linkages[i].angle += 360;
+        while (linkages[i].angle > 180)  linkages[i].angle -= 360;
+        last_pos = {
+            x: pos[i].x + diff1.length * Math.cos(diff2.angle * Math.PI / 180),
+            y: pos[i].y + diff1.length * Math.sin(diff2.angle * Math.PI / 180)
+        };
+    }
 };
 
 function draw() {
@@ -151,6 +184,7 @@ function init() {
         var eye_to_intersection = numeric.mul(s2 / s1, eye_to_mouse);
         var target_position = numeric.add(camera.eye, eye_to_intersection);
         compute_ik(target_position);
+        update_position();
         draw();
         document.getElementById("input_selected").onchange();
     }
@@ -162,6 +196,18 @@ function init() {
         is_dragging = false;
     };
     document.getElementById("input_selected").max = linkages.length - 1;
+    document.getElementById("linkage_number").onchange = function() {
+        // lengthは0.8~1.2でrandom
+        // angleは0
+        while (linkages.length < document.getElementById("linkage_number").value) {
+            linkages.push({angle: 0, length: Math.random() * 0.4 + 0.8});
+        }
+        while (linkages.length > document.getElementById("linkage_number").value) {
+            linkages.pop();
+        }
+        update_position();
+        draw();
+    }
     document.getElementById("input_selected").onchange = function(){
         document.getElementById("input_angle").value = linkages[this.value].angle;
         draw();
@@ -187,6 +233,7 @@ function init() {
       </td>
       <td>
         <ul>
+          <li>Number of Linkage: <input type="number" id="linkage_number" step="1" min="0" value="0"></li>
           <li>Selected Linkage: <input type="number" id="input_selected" step="1" min="0" value="0"></li>
           <li>Selected Linkage's Angle: <input type="number" id="input_angle" step="5" value="0"></li>
           <li><input type="checkbox" id="input_ikmode"> IK Mode</li>
