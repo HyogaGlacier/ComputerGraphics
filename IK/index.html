@@ -65,6 +65,7 @@ function compute_ik(target_position) {
         // diff2.angle - diff1.angleだけ回転
         // last_pos = pos[i] + (length=diff1.length, angle=diff2.angle)
         linkages[i].angle += diff2.angle - diff1.angle;
+        linkages[i].angle = Math.min(150, Math.max(0, linkages[i].angle));
         while (linkages[i].angle < -180) linkages[i].angle += 360;
         while (linkages[i].angle > 180)  linkages[i].angle -= 360;
         last_pos = {
