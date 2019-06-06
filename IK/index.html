@@ -65,12 +65,19 @@ function compute_ik(target_position) {
         // diff2.angle - diff1.angleだけ回転
         // last_pos = pos[i] + (length=diff1.length, angle=diff2.angle)
         linkages[i].angle += diff2.angle - diff1.angle;
-        while (linkages[i].angle < -180) linkages[i].angle += 360;
-        while (linkages[i].angle > 180)  linkages[i].angle -= 360;
         last_pos = {
             x: pos[i].x + diff1.length * Math.cos(diff2.angle * Math.PI / 180),
             y: pos[i].y + diff1.length * Math.sin(diff2.angle * Math.PI / 180)
         };
+    }
+    for (let i = 0; i < linkages.length; i++) {
+        let linkage_avg = {num: 0, sum_angle: 0};
+        for (let j = i - 1; j <= i + 1; j++) {
+            if (0 <= j && j < linkages.length) {
+                linkage_avg = {num: linkage_avg.num + 1, sum_angle: linkage_avg.sum_angle + linkages[i].angle};
+            }
+        }
+        linkages[i].angle = linkage_avg.sum_angle / linkage_avg.num;
     }
 };
 

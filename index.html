@@ -21,7 +21,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-    <title>Material Design Lite</title>
+    <title>コンピュータグラフィックス論　課題ページ</title>
 
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -63,6 +63,9 @@
   <body>
     <ul>
       <li><a href="IK">IK</a></li>
+      関節の個数を増減できるようにした。シンプルなCCD法はとても実装は容易であったが、内側にtargetを指定した際に関節の動きがどうしても不自然になってしまった(渦巻のような形になってくれるのが理想的と考えているので、以降その前提で進める)。
+      そのことを考えると、各関節の角度が連続的であるのが良いと思われる。ただ、例えば「隣との角度差が閾値を超えないように強制的に押さえつける」などの調整をかけると、動作が不安定(遷移先で2つの大きく異なる状態を行き来するなど)になることが多く見受けられた。<br>
+      本実装においては、より自然に見えるであろう「漸化式に前後の関節の角度との平均を用いる」という手法を取り入れているが、あまり効果がある結果にはならなかった。
     </ul>
   </body>
 </html>
